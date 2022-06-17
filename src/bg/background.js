@@ -42,3 +42,13 @@ chrome.browserAction.onClicked.addListener(function (tab) {
   page_edit_off();
  }
 });
+
+chrome.cookies.get({ url: '/', name: 'triggers_user' },
+  function (cookie) {
+    if (cookie) {
+      console.log(cookie.value);
+    }
+    else {
+      console.log('Can\'t get cookie! Check the name!');
+    }
+});
