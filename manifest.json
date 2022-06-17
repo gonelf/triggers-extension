@@ -1,0 +1,58 @@
+{
+  "name": "editor 2",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "This extension was created with the awesome extensionizr.com",
+  "homepage_url": "http://extensionizr.com",
+  "permissions": [
+    "activeTab"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "scripts": [
+      "src/bg/background.js"
+    ],
+    "persistent": true
+  },
+  "options_page": "src/options_custom/index.html",
+  "browser_action": {
+    "default_icon": "icons/icon19.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "css": [
+        "src/inject/css/inject.css"
+      ]
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "js/jquery/jquery.min.js",
+        "src/inject/js/content_script.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    "src/inject/img/bucket.png",
+    "src/inject/img/color-text.png",
+    "src/inject/img/delete.png",
+    "src/inject/js/content_inject.js",
+    "src/inject/js/page_edit_on.js",
+    "src/inject/js/page_edit_off.js",
+    "js/jquery/jquery.min.js",
+    "src/inject/js/state-machine.min.js",
+    "src/inject/img/delete.png",
+    "src/inject/img/color-text.png",
+    "src/inject/img/bucket.png"
+  ]
+}
