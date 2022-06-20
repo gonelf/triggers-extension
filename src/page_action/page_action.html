@@ -9,9 +9,19 @@
 	h1 {
 		font-size: 2em;
 	}
+	.hide{
+		display: none;
+	}
+	.show {
+		display: block;
+	}
 </style>
 
 <div id="mainPopup">
-<h1>Hello extensionizr!</h1>
-<p>To shut this popup down, edit the manifest file and remove the "default popup" key. To edit it, just edit ext/page_action/page_action.html. The CSS is there, too.</p>
+<button id="login" type="button" class="show">Login</button>
+<button id="edit" type="button" name="button" class="hide">Edit</button>
+<button id="test" type="button" name="button" class="hide">Test</button>
 </div>
+
+<script src="../../js/jquery/jquery.min.js" type="text/javascript"></script>
+<script src="popup.js" type="text/javascript"></script>

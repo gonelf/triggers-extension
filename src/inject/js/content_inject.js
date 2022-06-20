@@ -103,6 +103,7 @@
 		page_edit_change_status = "none";
 	}
 
+
 	var page_edit_on = false;
 	var target=null, fontcolor, bgcolor;
 	var page_edit_status = "none", page_edit_change_status = "none";
