@@ -5,7 +5,7 @@
   const {evtToPage, evtFromPage} = JSON.parse(el.dataset.args);
   el.remove();
   addEventListener(evtToPage, () => {
-    console.log(evtToPage);
+    console.log("evtToPage: "+evtToPage);
     dispatchEvent(new CustomEvent(evtFromPage, {
       // stringifying strips nontranferable things like functions or DOM elements
       detail: JSON.stringify(window.config),

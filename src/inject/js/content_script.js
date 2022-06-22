@@ -37,6 +37,9 @@ inject("src/inject/js/content_inject.js");
 const evtToPage = chrome.runtime.id;
 const evtFromPage = chrome.runtime.id + '-response';
 
+var ext_id = "var triggers_ext_id = '"+evtToPage+"';";
+inject_code(ext_id);
+
 // this creates a script element with the function's code and passes event names
 const script = document.createElement('script');
 script.textContent = `(${inPageContext})("${evtToPage}", "${evtFromPage}")`;

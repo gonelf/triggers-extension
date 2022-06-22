@@ -48,6 +48,11 @@
       ]
     }
   ],
+  "externally_connectable": {
+    "matches": [
+      "https://9c56-79-169-178-176.eu.ngrok.io/*"
+    ]
+  },
   "web_accessible_resources": [
     "src/inject/img/bucket.png",
     "src/inject/img/color-text.png",

@@ -1,5 +1,7 @@
 // chrome.extension.sendMessage({}, function(response) {
 	// var readyStateCheckInterval = setInterval(function() {
+var jq = jQuery.noConflict();
+
 	function rgb2hex(rgb){
 	 rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
 	 return (rgb && rgb.length === 4) ? "#" +
@@ -31,9 +33,9 @@
 		// '<div class="icon_separator">&nbsp;</div>'+
 		// '<img id="bgcolor" class="icon bgcolor" src="'+icon_bucket+'" />';
 
-		fontcolor = $(target).css("color");
-		bgcolor =  $(target).css("background-color");
-		link = $(target).attr("href");
+		fontcolor = jq(target).css("color");
+		bgcolor =  jq(target).css("background-color");
+		link = jq(target).attr("href");
 
 		var show_link = '<input id="editor_link" class="editor_link" value="'+link+'"></input>'+
 		'<input id="editor_remove_link" type="button" value="remove link"></input>';
@@ -55,20 +57,41 @@
 		'<h2>Background color:</h2>'+
 		'<input type="color" class="bg-colorpicker colorpicker" id="bg-colorpicker" value="'+rgb2hex(bgcolor)+'">'+
 		'<div id="editor_footer" class="editor_footer">'+
-		'<input type="button" id="editor_clone_item" class="editor_clone_item" value="Clone"></input>'+
-		'<input type="button" id="editor_delete" class="editor_delete" value="Delete"></input>'+
-		'<input type="button" id="editor_close" class="editor_close" value="Close"></input>'+
+		'<input type="button" id="editor_clone_item" class="trgg_editor_clone_item" value="Clone"></input>'+
+		'<input type="button" id="editor_delete" class="trgg_editor_delete" value="Delete"></input>'+
+		'<input type="button" id="editor_close" class="trgg_editor_close" value="Close"></input>'+
 		'</div>'+
+		'</div>';
+	}
+
+	function create_trigger_creator(top, left, width=0) {
+		return '<div id="editor" class="trgg_trigger" style="top: '+top+'px; left: '+left+'px;">'+
+			'<h5>Add trigger</h5>'+
+			'<p>Type</p>'+
+			'<select>'+
+				'<option value=”click”>Click</option>'+
+				'<option value=”submit”>Submit</option>'+
+				'<option value=”pageload”>PageLoad</option>'+
+			'</select>'+
+			'<p>Name</p>'+
+			'<input type="text" name="name" />'+
+			'<p>Properties</p>'+
+			'<input type="text" name="prop1_key" />'+
+			'<input type="text" name="prop1_value" />'+
+			'<input type="button" value="+ property" />'+
+			'</hr>'+
+			'<input type="button" value="Cancel" />'+
+			'<input type="button" value="Save" />'+
 		'</div>';
 	}
 
 	function clean(){
 		console.log("clean");
-		// $(".editor").remove();
-		$(".delete").remove();
-		if($(target) && target!=null){
-			$(target).attr("contenteditable", false);
-			$(target).removeClass("select");
+		// jq(".editor").remove();
+		jq(".delete").remove();
+		if(jq(target) && target!=null){
+			jq(target).attr("contenteditable", false);
+			jq(target).removeClass("select");
 			target = null;
 		}
 	}
@@ -87,7 +110,7 @@
 				page_edit_status = "element"
 				break;
 			case "unfocus":
-				$("#editor").remove();
+				jq("#editor").remove();
 				clean();
 				break;
 			case "menu":
@@ -96,7 +119,7 @@
 			case "delete":
 				console.log("delete");
 				clean();
-				$("#editor").remove();
+				jq("#editor").remove();
 				page_edit_status = "none";
 				break;
 		}
@@ -122,10 +145,10 @@
 
 		page_edit_status_interval = setInterval(update_status, 10);
 
-		$(document).on("click", "p, h1, h2, h3, h4, h5, h6, span, pre, button, a, div", function(e){
+		jq(document).on("click", "button, a", function(e){
 			//e.preventDefault();
 			id = e.target.id;
-			tag = $(e.target)[0].nodeName.toLowerCase();
+			tag = jq(e.target)[0].nodeName.toLowerCase();
 
 			// console.log("page_edit_on", page_edit_on);
 			// console.log("e.target.id", id);
@@ -142,21 +165,23 @@
 				page_edit_change_status = "new_element";
 				update_status();
 
-				var top = $(this).offset().top;
-				var left = $(this).offset().left;
-				var width = $(this).width();
-				$(this).addClass("select");
+				var top = jq(this).offset().top;
+				var left = jq(this).offset().left;
+				var width = jq(this).outerWidth();
+				var height = jq(this).outerHeight();
+				jq(this).addClass("select");
 				target = this;
-				$("body").append(create_delete(top, left+width));
-				$("body").append(create_editor(0, 0, width));
-				$(this).attr("contenteditable", true);
-				$(this).focus();
+				// jq("body").append(create_delete(top, left+width));
+				jq("body").append(create_trigger_creator(top+height, left+width, width));
+				// jq("body").append(create_editor(0, 0, width));
+				// jq(this).attr("contenteditable", true);
+				// jq(this).focus();
 				// console.log("this", this);
 				return false;
 			}
 		});
 
-		// $(document).on("focusout", ".select", function(e){
+		// jq(document).on("focusout", ".select", function(e){
 		// 	if(page_edit_on){
 		//
 		// 		console.log("focusout");
@@ -165,71 +190,71 @@
 		// 	}
 		// });
 
-		$(document).on("click", ".delete, .editor_delete", function(e){
+		jq(document).on("click", ".delete, .editor_delete", function(e){
 			if(page_edit_on){
 				console.log("delete");
 				console.log("target", target);
-				$(target).remove();
+				jq(target).remove();
 				page_edit_change_status = "delete";
 			}
 		});
 		// font colorpicker
-		$(document).on("input", ".font-colorpicker", function(e){
+		jq(document).on("input", ".font-colorpicker", function(e){
 			if(page_edit_on){
 
 				console.log("colorpicker change");
 				var newcolor = e.target.value;
 				console.log(newcolor);
-				$(target).css("color", newcolor);
+				jq(target).css("color", newcolor);
 			}
 		});
 
-		$(document).on("change", ".font-colorpicker", function(e){
+		jq(document).on("change", ".font-colorpicker", function(e){
 			if(page_edit_on){
 
 				console.log("colorpicker close");
-				$(target).focus();
+				jq(target).focus();
 			}
 		});
 		// bg colorpicker
-		$(document).on("input", ".bg-colorpicker", function(e){
+		jq(document).on("input", ".bg-colorpicker", function(e){
 			if(page_edit_on){
 
 				console.log("bg-colorpicker change");
 				var newcolor = e.target.value;
 				console.log(newcolor);
-				$(target).css("background-color", newcolor);
+				jq(target).css("background-color", newcolor);
 			}
 		});
 
-		$(document).on("change", ".bg-colorpicker", function(e){
+		jq(document).on("change", ".bg-colorpicker", function(e){
 			if(page_edit_on){
 
 				console.log("bg-colorpicker close");
-				$(target).focus();
+				jq(target).focus();
 			}
 		});
 
-		$(document).on("input", ".editor_link", function(e){
+		jq(document).on("input", ".editor_link", function(e){
 			if(page_edit_on){
 				console.log("link change");
-				link = $("#editor_link")[0].value;
-				$(target).attr("href", link);
+				link = jq("#editor_link")[0].value;
+				jq(target).attr("href", link);
 			}
 		});
 
-		$(document).on("click", ".editor_clone_item", function(e){
+		jq(document).on("click", ".editor_clone_item", function(e){
 			if(page_edit_on){
 				console.log("clone click");
 				console.log(target, "'"+copy+"'");
-				var copy = $(target).clone();
-				$(copy).attr("contenteditable", false);
-				$(copy).removeClass("select");
-				$(copy).insertAfter($(target));
+				var copy = jq(target).clone();
+				jq(copy).attr("contenteditable", false);
+				jq(copy).removeClass("select");
+				jq(copy).insertAfter(jq(target));
 			}
 		});
 
-		$(document).on("click", ".editor_close", function(e){
+		jq(document).on("click", ".editor_close", function(e){
 			if(page_edit_on){
 				console.log("editor close");
 				page_edit_change_status = "unfocus";
@@ -237,7 +262,7 @@
 			}
 		});
 
-		$(document).on("click", ".editor_undo", function(e){
+		jq(document).on("click", ".editor_undo", function(e){
 			if(page_edit_on){
 				console.log("editor undo");
 				doUndo();

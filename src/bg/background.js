@@ -6,6 +6,10 @@
 var enable=false;
 var main_page = "https://9c56-79-169-178-176.eu.ngrok.io/";
 
+// if (enable != localStorage.getItem('enable')) {
+//   enable = localStorage.getItem('enable');
+//   handle_popup_comms("edit");
+// }
 
 function goto_login() {
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
@@ -22,13 +26,6 @@ function handler(evt) {
   });
 }
 
-//example of using a message handler from the inject scripts
-chrome.extension.onMessage.addListener(
-  function(request, sender, sendResponse) {
-  	chrome.pageAction.show(sender.tab.id);
-    sendResponse();
-  }
-);
 
 function handle_popup_comms (msg) {
   // if (msg == "edit") {
@@ -44,6 +41,7 @@ function handle_popup_comms (msg) {
        // chrome.browserAction.setIcon({ path: 'disable.png'});
        page_edit_off();
       }
+      localStorage.setItem('enable', enable);
       break;
 
       case "login":
@@ -56,18 +54,10 @@ function handle_popup_comms (msg) {
   // }
 }
 
-// communicate with mainPopup
-chrome.extension.onConnect.addListener(function(port) {
-     handler("Connected .....");
-     port.onMessage.addListener(function(msg) {
-          handler("message recieved: " + msg);
-          port.postMessage("Hi Popup.js");
-          handle_popup_comms(msg);
-     });
-})
 
-
+var getting_cookie = false;
 function getCookie(domain, name, callback) {
+  getting_cookie=true;
   chrome.cookies.get({"url": domain, "name": name}, function(cookie) {
     // handler("get cookie")
     // handler(cookie);
@@ -83,7 +73,7 @@ function page_edit_off(){
 }
 
 function page_edit_on (){
-  chrome.browserAction.setBadgeText({ text: 'ON' });
+  chrome.browserAction.setBadgeText({ text: 'EDIT' });
   handler("page_edit_on");
 }
 
@@ -103,25 +93,56 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 });
 
 function check_login(){
-  handler("check login");
+  // handler("check login");
   const domain = "https://9c56-79-169-178-176.eu.ngrok.io";
-
-  getCookie(domain, "triggers_user", function(cookie) {
+  if(!getting_cookie){
+    // handler("check login");
+    getCookie(domain, "triggers_user", function(cookie) {
       // handler(cookie);
       var key = "triggers_user";
       // handler(cookie ? "yes" : "no");
       if (cookie) {
-          var value = JSON.parse(cookie.value);
+        var value = cookie.value;
+        if (value != localStorage.getItem(key)){
           localStorage.setItem(key, value);
+          handler(localStorage.getItem(key));
+        }
       }
       else {
         localStorage.removeItem(key);
       }
-  });
+      getting_cookie=false;
+    });
+  }
 }
 
+// chrome extension functions ///////////////////////////////////////////////
 
+//example of using a message handler from the inject scripts
+chrome.extension.onMessage.addListener(
+  function(request, sender, sendResponse) {
+  	chrome.pageAction.show(sender.tab.id);
+    sendResponse();
+  }
+);
+
+// communicate with mainPopup
+chrome.extension.onConnect.addListener(function(port) {
+     handler("Connected .....");
+     port.onMessage.addListener(function(msg) {
+          handler("comms with popup: " + msg);
+          port.postMessage("Hi Popup.js");
+          handle_popup_comms(msg);
+     });
+});
+
+// listen to messages from the web
+chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse){
+  handler("message form the web: "+request.messageFromWeb);
+});
+
+
+// actions
 setInterval(()=>{
   check_login();
-  handler(tab_url());
 }, 1000);
